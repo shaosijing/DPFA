@@ -1,4 +1,4 @@
-sample_Z_timespan_try3 = function(x_kn , p0, rk, Phi,W, sk, p1,C_k1n, Pi_k, numSample,ZZip){
+sample_Z = function(x_kn , p0, rk, Phi,W, sk, p1,C_k1n, Pi_k, numSample,ZZip){
   numTime = ncol(x_kn)/numSample
   K = nrow(x_kn)
   

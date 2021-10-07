@@ -111,9 +111,9 @@ Rep<-A[args,5]
 seed <- Rep+100
 source("crt.R")
 source("update_Z.R")
-source("mult_rnd4.R")
+source("mult.R")
 #out2 = mult_rnd3(C_kn,Phi,W, ZZip)
-source("sample_Z_timespan_try3.R")
+source("sample_Z.R")
 #source("mult_rnd_latent.R")
 
 numTotal = (numTime) * numSample
@@ -190,7 +190,7 @@ fits <- matrix(NA,niter,2)
 t1=proc.time()
 for(b in 1:niter){
   
-  out = mult_rnd4(Xmtot,Psi,Theta, ZZip)
+  out = mult(Xmtot,Psi,Theta, ZZip)
   x_pk = out[[1]]
   x_kn = out[[2]]
   #print(x_pk)
@@ -249,12 +249,12 @@ for(b in 1:niter){
   
   C_kn = matrix(C_kn, nrow=K)
   
-  out2 = mult_rnd4(C_kn,Phi,W, ZZip)
+  out2 = mult(C_kn,Phi,W, ZZip)
   C_kk1 = out2[[1]]
   C_k1n = out2[[2]]
   
   
-  res=sample_Z_timespan_try3(x_kn , p0, rk, Phi,W_time, sk, p1,C_k1n,Pi_k, numSample,ZZip)
+  res=sample_Z(x_kn , p0, rk, Phi,W_time, sk, p1,C_k1n,Pi_k, numSample,ZZip)
   ZZip = res[[1]]
   # ZZip[is.na(ZZip)] <- 0
   ### z0 = res[[2]]

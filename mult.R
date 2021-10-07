@@ -1,6 +1,6 @@
 library(R.utils)
 
-mult_rnd4 = function(x_mtn,psi, theta, ZZip){
+mult = function(x_mtn,psi, theta, ZZip){
   M = nrow(psi)
   K = ncol(psi)
   NT = dim(theta)[2]
