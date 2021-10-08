@@ -145,3 +145,20 @@ List mult_cpp(arma::mat X_mtn, arma::mat Psi, arma::mat Theta, arma::mat ZZip) {
 
   return Rcpp::List::create(Rcpp::Named("X_mk2") = X_mk2, Rcpp::Named("X_kn2") = X_kn2);  
 }
+
+// [[Rcpp::export]]
+arma::rowvec crt_cpp(arma::mat X_kn, arma::vec rk) {
+  int K = rk.n_elem;
+  int nTotal = X_kn.n_cols;
+  arma::rowvec L(K);
+
+  for (int k = 0; k < K; k++) {
+    for (int n = 0; n < nTotal; ++n) {
+      for (int i = 0; i < X_kn(k, n); ++i) {
+				L[k] += (double)( Rf_runif(0, 1) <= rk[k]/( rk[k] + i ) );
+      }
+    }
+  }
+
+  return L;
+}
