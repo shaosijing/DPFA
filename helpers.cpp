@@ -15,8 +15,8 @@ int rztpois_single(double lambda) {
 }
 
 // [[Rcpp::export]]
-arma::vec rztpois_cpp(unsigned int n, double lambda){
-  arma::vec d;
+arma::rowvec rztpois_cpp(unsigned int n, double lambda){
+  arma::rowvec d;
   d.zeros(n);
   for (unsigned int i = 0; i < n; ++i) {
     d(i) = rztpois_single(lambda);
@@ -44,7 +44,7 @@ arma::Cube<int> calcC_kn(arma::Cube<int> ZZip_3D, arma::vec bias_0, arma::Cube<i
       for (int k = 0; k < K; ++k) {
         if (ZZip_3D(k, t, n) == 0) {
           C_kn(k, t, n) = 0;
-        } else if (ZZip_3D(k, 0, n) ==1){
+        } else if (ZZip_3D(k, 0, n) == 1){
           auto w1 = W_3D.slice(n);
           auto z2 = ZZip_3D.slice(n);
           arma::mat ret = Phi * (w1.col(t-1) % z2.col(t-1));
