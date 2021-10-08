@@ -155,7 +155,7 @@ arma::rowvec crt_cpp(arma::mat X_kn, arma::vec rk) {
   for (int k = 0; k < K; k++) {
     for (int n = 0; n < nTotal; ++n) {
       for (int i = 0; i < X_kn(k, n); ++i) {
-				L[k] += (double)( Rf_runif(0, 1) <= rk[k]/( rk[k] + i ) );
+        L[k] += (double)( Rf_runif(0, 1) <= rk[k]/( rk[k] + i ) );
       }
     }
   }
