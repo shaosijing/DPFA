@@ -5,31 +5,6 @@
 using namespace Rcpp;
 
 
-// C_kn = array(NA, dim= c(K, numTime, numSample))
-//   for (n in 1:numSample){
-//     for (k in 1:K){
-//       if (ZZip_3D[k,1,n] == 0){
-//         C_kn[k,1,n] = 0
-//       } else if (ZZip_3D[k,1,n] ==1){
-//         C_kn[k,1,n] = rztpois(1,bias_0[k])
-//       }
-//     }
-//   }
-//   
-//   for (n in 1:numSample){
-//     for (t in 2:numTime){
-//       for (k in 1:K){
-//         if (ZZip_3D[k,t,n]==0){
-//           C_kn[k,t,n] = 0
-//         }
-//         else if (ZZip_3D[k,t,n]==1){
-//           C_kn[k,t,n] = rztpois(1, (Phi%*%(W_3D[,t-1,n]*ZZip_3D[,t-1,n]))[k]+bias_0[k])}
-// #  if (is.na(C_kn[k,t,n]) == TRUE) print(c(n, t))
-//       }
-//     }
-//   }
-
-
 // [[Rcpp::export]]
 int rztpois_single(double lambda) {
   if (lambda < 0 || !R_FINITE(lambda)) return R_NaN;
@@ -50,9 +25,6 @@ arma::vec rztpois_cpp(unsigned int n, double lambda){
 }
 // [[Rcpp::export]]
 arma::Cube<int> calcC_kn(arma::Cube<int> ZZip_3D, arma::vec bias_0, arma::Cube<int> W_3D, arma::mat Phi) {
-  Environment pkg = Environment::namespace_env("actuar");
-  Function f = pkg["rztpois"];
-  
   int K = ZZip_3D.n_rows;
   int nTime = ZZip_3D.n_cols;
   int nSample = ZZip_3D.n_slices;
