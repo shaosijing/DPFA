@@ -266,7 +266,7 @@ for(b in 1:niter){
     Phi[,i] <-  rdirichlet(1,(alpha_psi+C_kk1)[,i])
   }
   
-  Lk = crt(C_k1n,sk)
+  Lk = crt_cpp(C_k1n,sk)
   #sumbpi = ZZip2%*%log(1-t(p1m)); # !!!!!! changed from original for p1m
   sumbpi = rowSums(ZZip) * log(1-p0)
   sk = rgamma(K, sk_a + Lk)/( 1/sk_b - sumbpi); # from code
