@@ -64,7 +64,7 @@ arma::mat calcTheta(arma::vec rk, arma::mat ZZip, arma::mat x_kn, double p0) {
   arma::mat Theta(N, M);
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < M; ++j) {
-      Theta(i,j) = Rf_rgamma(rk(i) * ZZip(i,j) + x_kn(i,j), 1/p0);
+      Theta(i,j) = Rf_rgamma(rk(i) * ZZip(i,j) + x_kn(i,j), p0);
     }
   }
   return Theta;
@@ -77,7 +77,7 @@ arma::mat calcW(arma::vec sk, arma::mat ZZip, arma::mat C_k1n, double p0) {
   arma::mat W(N, M);
   for (int i = 0; i < N; ++i) {
     for (int j = 0; j < M; ++j) {
-      W(i,j) = Rf_rgamma(sk(i) * ZZip(i,j) + C_k1n(i,j), 1/p0);
+      W(i,j) = Rf_rgamma(sk(i) * ZZip(i,j) + C_k1n(i,j), p0);
     }
   }
   return W;

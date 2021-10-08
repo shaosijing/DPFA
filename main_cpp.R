@@ -185,14 +185,13 @@ Pi_k <- BPL(Phi %*% (W *ZZip))
 
 p1m = matrix(.5,1,numTotal)#rep(.5,numTotal)#rep(p1/(p1+(1-p1)*timeSpan),numSample); # seems wrong
 
-# just do 5000 samples to start
+# just do niter samples to start
 niter=5000
 rett <- list()
 fits <- matrix(NA,niter,2)
 
 t1=proc.time()
 for(b in 1:niter){
-  
   out = mult_cpp(Xmtot,Psi,Theta, ZZip)
   x_pk = out[[1]]
   x_kn = out[[2]]
@@ -313,70 +312,70 @@ t2
 
 #View(rett[[30]]$Xmtot)
 
+fS <- 2000
+psi.array <- array(NA,c(dim(Psi),(niter-fS)))
 
-psi.array <- array(NA,c(dim(Psi),(niter-2000)))
-
-for(i in 1:(niter-2000)){
-  psi.array[,,i] <- rett[[i+2000]]$Psi
+for(i in 1:(niter-fS)){
+  psi.array[,,i] <- rett[[i+fS]]$Psi
 }
 
 
-mean.psi <- matrix(0,dim(Psi)[1],dim(Psi)[2])
+sum.psi <- matrix(0,dim(Psi)[1],dim(Psi)[2])
 
-for(i in 1:(niter-2000)){
-  mean.psi <- mean.psi + psi.array[,,i]
+for(i in 1:(niter-fS)){
+  sum.psi <- sum.psi + psi.array[,,i]
 }
-psi_est = round(mean.psi/(niter-2000),2)
+psi_est = round(sum.psi/(niter-fS),2)
 
 
-Phi.array <- array(NA,c(dim(Phi),(niter-2000)))
-for(i in 1:(niter-2000)){
-  Phi.array[,,i] <- rett[[2000+i]]$Phi
+Phi.array <- array(NA,c(dim(Phi),(niter-fS)))
+for(i in 1:(niter-fS)){
+  Phi.array[,,i] <- rett[[fS+i]]$Phi
 }
-mean.Phi <- matrix(0,dim(Phi)[1],dim(Phi)[2])
+sum.Phi <- matrix(0,dim(Phi)[1],dim(Phi)[2])
 
-for(i in 1:(niter-2000)){
-  mean.Phi <- mean.Phi + Phi.array[,,i]
-}
-
-phi_est = round(mean.Phi/(niter-2000),3)
-
-
-Theta.array <- array(NA,c(dim(Theta),(niter-2000)))
-for(i in 1:(niter-2000)){
-  Theta.array[,,i] <- rett[[2000+i]]$Theta
-}
-mean.Theta <- matrix(0,dim(Theta)[1],dim(Theta)[2])
-
-for(i in 1:(niter-2000)){
-  mean.Theta <- mean.Theta + Theta.array[,,i]
+for(i in 1:(niter-fS)){
+  sum.Phi <- sum.Phi + Phi.array[,,i]
 }
 
-theta_est = round(mean.Theta/(niter-2000),3)
+phi_est = round(sum.Phi/(niter-fS),3)
 
-W.array <- array(NA,c(dim(rett[[5000]]$W),(niter-2000)))
-for(i in 1:(niter-2000)){
-  W.array[,,i] <- rett[[2000+i]]$W
+
+Theta.array <- array(NA,c(dim(Theta),(niter-fS)))
+for(i in 1:(niter-fS)){
+  Theta.array[,,i] <- rett[[fS+i]]$Theta
+}
+sum.Theta <- matrix(0,dim(Theta)[1],dim(Theta)[2])
+
+for(i in 1:(niter-fS)){
+  sum.Theta <- sum.Theta + Theta.array[,,i]
+}
+
+theta_est = round(sum.Theta/(niter-fS),3)
+
+W.array <- array(NA,c(dim(rett[[niter]]$W),(niter-fS)))
+for(i in 1:(niter-fS)){
+  W.array[,,i] <- rett[[fS+i]]$W
 }
 mean.W <- matrix(0,dim(W)[1],dim(W)[2])
 
-for(i in 1:(niter-2000)){
+for(i in 1:(niter-fS)){
   mean.W <- mean.W + W.array[,,i]
 }
 
-W_est = round(mean.W/(niter-2000),3)
+W_est = round(mean.W/(niter-fS),3)
 
-ZZip.array <- array(NA,c(dim(rett[[5000]]$ZZip),(niter-2000)))
-for(i in 1:(niter-2000)){
-  ZZip.array[,,i] <- rett[[2000+i]]$ZZip
+ZZip.array <- array(NA,c(dim(rett[[niter]]$ZZip),(niter-fS)))
+for(i in 1:(niter-fS)){
+  ZZip.array[,,i] <- rett[[fS+i]]$ZZip
 }
 mean.ZZip <- matrix(0,dim(ZZip)[1],dim(ZZip)[2])
 
-for(i in 1:(niter-2000)){
+for(i in 1:(niter-fS)){
   mean.ZZip <- mean.ZZip + ZZip.array[,,i]
 }
 
-ZZip_est = round(mean.ZZip/(niter-2000),3)
+ZZip_est = round(mean.ZZip/(niter-fS),3)
 ZZip_rowsums = rowSums(ZZip_est)
 
 return<- list(ret,psi_est,phi_est,theta_est,W_est,ZZip_est,ZZip_rowsums)
