@@ -10,7 +10,7 @@ int rztpois_single(double lambda) {
   if (lambda < 0 || !R_FINITE(lambda)) return R_NaN;
   
   /* limiting case as lambda approaches zero is point mass at one */
-  if (lambda == 0) return 1.0;
+  if (lambda < 0.000001) return 1.0;
   return Rf_qpois(Rf_runif(exp(-lambda), 1), lambda, 1, 0);
 }
 
