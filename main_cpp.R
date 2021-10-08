@@ -227,7 +227,7 @@ for(b in 1:niter){
   C_kn <- calcC_kn(ZZip_3D, bias_0, W_3D, Phi)
   C_kn = matrix(C_kn, nrow=K)
   
-  out2 = mult(C_kn,Phi,W, ZZip)
+  out2 = mult_cpp(C_kn,Phi,W, ZZip)
   C_kk1 = out2[[1]]
   C_k1n = out2[[2]]
   
@@ -245,7 +245,7 @@ for(b in 1:niter){
   
   
   # chinese restaurant table distribution
-  Lk = crt(x_kn,rk)
+  Lk = crt_cpp(x_kn,rk)
   
   
   
