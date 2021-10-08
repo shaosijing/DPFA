@@ -82,3 +82,66 @@ arma::mat calcW(arma::vec sk, arma::mat ZZip, arma::mat C_k1n, double p0) {
   }
   return W;
 }
+
+// [[Rcpp::export]]
+List mult_cpp(arma::mat X_mtn, arma::mat Psi, arma::mat Theta, arma::mat ZZip) {
+  int M = Psi.n_rows;
+  int K = Psi.n_cols;
+  int NT = Theta.n_cols;
+  arma::Cube<double> lambda_mknt(M, K, NT);
+  arma::Cube<double> lambda_mknt_hat(M, K, NT);
+  arma::Cube<int> latent_count(M, K, NT);
+
+  for (int n = 0; n < NT; ++n) {
+    for (int m = 0; m < M; ++m) {
+      for (int k = 0; k < K; ++k) {
+        lambda_mknt(m, k, n) = Psi(m, k) * Theta(k, n) * ZZip(k, n);
+      }
+    }
+  }
+  
+  for (int n = 0; n < NT; ++n) {
+    for (int m = 0; m < M; ++m) {
+      for (int k = 0; k < K; ++k) {
+        auto s = sum(lambda_mknt.slice(n).col(k));
+        if (s != 0)
+          lambda_mknt_hat(m, k, n) = lambda_mknt(m, k, n) / s;
+        else
+          lambda_mknt_hat(m, k, n) = 0;
+      }
+    }
+  }
+
+  
+  for (int n = 0; n < NT; ++n) {
+    for (int m = 0; m < M; ++m) {
+      if (sum(lambda_mknt_hat.slice(n).row(m)) !=0 ) {
+        arma::rowvec probs = lambda_mknt_hat.slice(n).row(m);
+        double s = arma::sum(probs);
+        probs = probs / s;
+        arma::irowvec v(K);
+        Rf_rmultinom(X_mtn(m, n), probs.begin(), K, v.begin());
+        latent_count.slice(n).row(m) = v;
+      } else {
+        latent_count.slice(n).row(m).fill(0);
+      }
+    }
+  }
+
+  arma:: mat X_mk2(M, K);
+  for (int n = 0; n < NT; ++n) {
+    X_mk2 = X_mk2 + latent_count.slice(n);
+  }
+
+  arma:: mat X_kn2(K, NT);
+  for (int k = 0; k < K; ++k) {
+    for (int n = 0; n < NT; ++n) {
+      for (int m = 0; m < M; ++m) {
+        X_kn2(k, n) = X_kn2(k, n) + latent_count(m, k, n);
+      }
+    }
+  }
+
+
+  return Rcpp::List::create(Rcpp::Named("X_mk2") = X_mk2, Rcpp::Named("X_kn2") = X_kn2);  
+}

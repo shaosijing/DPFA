@@ -193,7 +193,7 @@ fits <- matrix(NA,niter,2)
 t1=proc.time()
 for(b in 1:niter){
   
-  out = mult(Xmtot,Psi,Theta, ZZip)
+  out = mult_cpp(Xmtot,Psi,Theta, ZZip)
   x_pk = out[[1]]
   x_kn = out[[2]]
   #print(x_pk)
