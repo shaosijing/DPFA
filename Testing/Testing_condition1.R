@@ -54,10 +54,8 @@ norm = function(x){
 
 # initialization
 
-Psi = matrix(rgamma(M*K,shape=alpha_psi),M,K) #randg(alpha_psi,P,K)
-for (i in 1:K){
-  Psi[,i] = Psi[,i]/sum(Psi[,i])
-}
+pca=prcomp(t(Xmtot))
+Psi = abs(pca$rotation[,1:3])
 
 K1 = K
 K2 = K
@@ -79,7 +77,7 @@ sk = rgamma(K,sk_a)*sk_b
 ZZip = (matrix(runif(K*numTotal),K,numTotal)<1)*1
 
 ZZip2 = update_Z(z0,ZZip,numTime)
-W = ZZip2 
+W = ZZip2
 Pi_k <- BPL(Phi %*% (W *ZZip))
 
 niter=5000
@@ -91,9 +89,9 @@ for(b in 1:niter){
   out = mult_cpp(Xmtot,Psi,Theta, ZZip)
   x_pk = out[[1]]
   x_kn = out[[2]]
-  
+
   W_time = sweep(W,2,timeSpan,'/')
-  
+
   matrix_to_array = function(matrix){
     K = 3
     numSample = 100
@@ -108,51 +106,51 @@ for(b in 1:niter){
   ZZip_3D = matrix_to_array(ZZip)
   C_kn <- calcC_kn(ZZip_3D, bias_0, W_3D, Phi)
   C_kn = matrix(C_kn, nrow=K)
-  
+
   out2 = mult_cpp(C_kn,Phi,W, ZZip)
   C_kk1 = out2[[1]]
   C_k1n = out2[[2]]
-  
+
   res=sample_Z(x_kn , p0, rk, Phi,W_time, sk, p1,C_k1n,Pi_k, numSample,ZZip)
   ZZip = res[[1]]
-  
+
   Psi = matrix(NA,dim(x_pk)[1],dim(x_pk)[2])
   for (i in 1:dim(x_pk)[2]){
     Psi[,i] <-  rdirichlet(1,(alpha_psi+x_pk)[,i])
   }
-  
+
   # chinese restaurant table distribution
   Lk = crt_cpp(x_kn,rk)
-  
+
   sumbpi = rowSums(ZZip) * log(1-p0)
   rk = rgamma(K, rk_a + Lk)/( rk_b - sumbpi); # from code
-  
+
   Theta = calcTheta(rk, ZZip, x_kn, p0)
-  
+
   Phi = matrix(NA,dim(x_pk)[2],dim(x_pk)[2])
   for (i in 1:dim(x_pk)[2]){
     Phi[,i] <-  rdirichlet(1,(alpha_psi+C_kk1)[,i])
   }
-  
+
   Lk = crt_cpp(C_k1n,sk)
   sumbpi = rowSums(ZZip) * log(1-p0)
   sk = rgamma(K, sk_a + Lk)/( 1/sk_b - sumbpi); # from code
   W = calcW(sk, ZZip, C_k1n, 0.5)
-  
+
   # Pi_k = rbeta(K,shape1 = a0 + rowSums(ZZip),shape2=b0 + numTotal*numTime - rowSums(ZZip));
   # Pi_k = matrix(rbeta(K*numTotal,a0,b0),K,numTotal)
   #theta = matrix(rgamma(rk*ZZip+ x_kn),dim(x_kn)) * p0;# from code
   #theta = matrix(rgamma(matrix(rk,K,numTotal) + x_kn,1),dim(x_kn)) # from paper
-  
+
   # nz = (Xmtot[,1:numTime]!=0)*1
   # lambda = Psi%*%Theta[,1:numTime]
   # RMSE = sum((Xmtot[,1:numTime][nz==1]-lambda[nz==1])^2)/numTotal
   # lambda_avg = lambda/colSums(lambda)
   # negLL = -  sum(Xmtot[nz==1]*log(lambda_avg[nz==1]))/sum(Xmtot[nz==1])
-  rett[[b]] <- list(Theta=Theta,Lk=Lk,Psi=Psi,rk=rk, Phi = Phi, Xmtot = Xmtot, sumbpi = sumbpi, W = W, x_kn = x_kn, ZZip = ZZip, 
+  rett[[b]] <- list(Theta=Theta,Lk=Lk,Psi=Psi,rk=rk, Phi = Phi, Xmtot = Xmtot, sumbpi = sumbpi, W = W, x_kn = x_kn, ZZip = ZZip,
                     C_kn = C_kn, C_k1n = C_k1n, C_kk1=C_kk1)
   # fits[b,] <- c(RMSE,negLL)
-  
+
   #print(b)
 }
 t2 = proc.time() - t1
@@ -227,32 +225,32 @@ ZZip_rowsums = rowSums(ZZip_est)
 return<- list(psi_est,phi_est,theta_est,W_est,ZZip_est,ZZip_rowsums)
 round(psi_est,2)
 phi_est
-psi_1_1= matrix(NA, nrow = niter,ncol = 1)
-for (i in 1:niter){
-  psi_1_1[i,1] = rett[[i]][["Psi"]][1,1]
-}
-psi_1_2= matrix(NA, nrow = niter,ncol = 1)
-for (i in 1:niter){
-  psi_1_2[i,1] = rett[[i]][["Psi"]][1,2]
-}
-psi_1_3= matrix(NA, nrow = niter,ncol = 1)
-for (i in 1:niter){
-  psi_1_3[i,1] = rett[[i]][["Psi"]][1,3]
-}
-psi_2_1= matrix(NA, nrow = niter,ncol = 1)
-for (i in 1:niter){
-  psi_2_1[i,1] = rett[[i]][["Psi"]][2,1]
-}
-psi_2_2= matrix(NA, nrow = niter,ncol = 1)
-for (i in 1:niter){
-  psi_2_2[i,1] = rett[[i]][["Psi"]][2,2]
-}
-psi_2_3= matrix(NA, nrow = niter,ncol = 1)
-for (i in 1:niter){
-  psi_2_3[i,1] = rett[[i]][["Psi"]][2,3]
-}
-psi13_first_row = cbind(psi_1_1,psi_1_2,psi_1_3)
-psi13_second_row = cbind(psi_2_1,psi_2_2,psi_2_3)
-par(mfrow=c(2,1))
-matplot(psi13_first_row)
+# psi_1_1= matrix(NA, nrow = niter,ncol = 1)
+# for (i in 1:niter){
+#   psi_1_1[i,1] = rett[[i]][["Psi"]][1,1]
+# }
+# psi_1_2= matrix(NA, nrow = niter,ncol = 1)
+# for (i in 1:niter){
+#   psi_1_2[i,1] = rett[[i]][["Psi"]][1,2]
+# }
+# psi_1_3= matrix(NA, nrow = niter,ncol = 1)
+# for (i in 1:niter){
+#   psi_1_3[i,1] = rett[[i]][["Psi"]][1,3]
+# }
+# psi_2_1= matrix(NA, nrow = niter,ncol = 1)
+# for (i in 1:niter){
+#   psi_2_1[i,1] = rett[[i]][["Psi"]][2,1]
+# }
+# psi_2_2= matrix(NA, nrow = niter,ncol = 1)
+# for (i in 1:niter){
+#   psi_2_2[i,1] = rett[[i]][["Psi"]][2,2]
+# }
+# psi_2_3= matrix(NA, nrow = niter,ncol = 1)
+# for (i in 1:niter){
+#   psi_2_3[i,1] = rett[[i]][["Psi"]][2,3]
+# }
+# psi13_first_row = cbind(psi_1_1,psi_1_2,psi_1_3)
+# psi13_second_row = cbind(psi_2_1,psi_2_2,psi_2_3)
+# par(mfrow=c(2,1))
+# matplot(psi13_first_row)
 matplot(psi13_second_row)
