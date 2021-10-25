@@ -5,11 +5,11 @@ fit_DIC <- function(rett, K, N, numTime, M){
   psi_sample_average_SJ<-apply(simplify2array(psi_sample_keep_SJ), 1:2, mean)
   
   
-  niter_SJ <- length(theta_sample)
- #  k_SJ = 3
- #  n_SJ = 100
- #  Time_SJ = 10
- #  m_SJ = 15
+  niter_SJ <- length(theta_sample_keep_SJ)
+ k_SJ = K
+ n_SJ = N
+ Time_SJ = numTime
+  m_SJ = M
   m_SJ = rep(m_SJ,n_SJ*Time_SJ)
   z_sample_DIC_SJ = Xmtot
   text_token_SJ = matrix(Xmtot,ncol = 1, byrow = F)
@@ -61,7 +61,7 @@ fit_DIC <- function(rett, K, N, numTime, M){
         psi_j_SJ <- t(psi_sample_keep_SJ[[s]])[,j]
         z_sample_keep_DIC[[s]][[i]][[t]][j]<- log(sum(theta_i_t_SJ*psi_j_SJ))
       }
-      sum(z_sample_keep_DIC[[s]][[i]][[t]])
+      #sum(z_sample_keep_DIC[[s]][[i]][[t]])
     }
   }
   }
@@ -73,7 +73,7 @@ fit_DIC <- function(rett, K, N, numTime, M){
       while (count <n_SJ*Time_SJ){
      z_sample[[count]] =lapply(z_sample_keep_DIC[[i]][[t]], function(x) sum(unlist(x)))
      count= count+1
-     print(count)
+    # print(count)
       }
     }
   }
