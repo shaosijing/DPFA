@@ -1,4 +1,5 @@
 # generate data, with true K = 3
+setwd("H:/Shared drives/SLAM Lab/ema_text/DFA R/dynamic_pfa/CRC/DPFA")
 library(extraDistr)
 library(Morpho)
 library(actuar)
@@ -102,19 +103,19 @@ M=15
 K=3
 numSample=100
 numTime = 10
-Rep <-1
-resfolder <- expand.grid(K,numSample,M,numTime)
-A<-expand.grid(K,numSample,M,numTime,Rep)
-args<-as.numeric(commandArgs(trailingOnly = TRUE))
-K<-A[args,1]
-numSample<-A[args,2]
-M<-A[args,3]
-numTime <-A[args,4]
-Rep<-A[args,5]
-seed <- Rep+100
-source("crt.R")
+#Rep <-1
+#resfolder <- expand.grid(K,numSample,M,numTime)
+#A<-expand.grid(K,numSample,M,numTime,Rep)
+#args<-as.numeric(commandArgs(trailingOnly = TRUE))
+#K<-A[args,1]
+#numSample<-A[args,2]
+#M<-A[args,3]
+#numTime <-A[args,4]
+#Rep<-A[args,5]
+seed <- 100
+#source("crt.R")
 source("update_Z.R")
-source("mult.R")
+#source("mult.R")
 #out2 = mult_rnd3(C_kn,Phi,W, ZZip)
 source("sample_Z.R")
 #source("mult_rnd_latent.R")
@@ -157,14 +158,24 @@ norm = function(x){
 
 # initialization
 
-Psi = psi_tru 
+
 #Psi = matrix(NA,M,K)
 #for (i in 1:K){
 #  Psi[,i] <-  rdirichlet(1,(alpha_psi)[,i])
 #}
 rk_tru = c(1,1,1)
 Theta=theta_tru
-Phi = phi_tru
+Psi = matrix(rgamma(M*K,shape=alpha_psi),M,K) #randg(alpha_psi,P,K)
+for (i in 1:K){
+  Psi[,i] = Psi[,i]/sum(Psi[,i])
+}
+
+K1 = K
+K2 = K
+Phi = matrix(rgamma(K1*K2,shape=alpha_phi),K1,K2) #randg(alpha_psi,P,K)
+for (i in 1:K2){
+  Phi[,i] = Phi[,i]/sum(Phi[,i])
+}
 
 rk = rk_tru
 z0 = matrix(1,K,numSample)
