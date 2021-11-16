@@ -3,11 +3,14 @@ library(Morpho)
 library(actuar)
 library(Rcpp)
 library(RcppArmadillo)
+setwd("H:/Shared drives/SLAM Lab/ema_text/DFA R/dynamic_pfa/CRC/DPFA/")
+
 sourceCpp('helpers.cpp')
-source("crt.R")
+#source("crt.R")
 source("update_Z.R")
-source("mult.R")
+#source("mult.R")
 source("sample_Z.R")
+source("fit_DIC.R")
 setwd("H:/Shared drives/SLAM Lab/ema_text/DFA R/dynamic_pfa/CRC/DPFA/Testing/")
 
 dataset = readRDS("true_para_data1.rds")
@@ -253,4 +256,6 @@ phi_est
 # psi13_second_row = cbind(psi_2_1,psi_2_2,psi_2_3)
 # par(mfrow=c(2,1))
 # matplot(psi13_first_row)
+
+fit_DIC(rett, K, N, numTime, M)
 matplot(psi13_second_row)
